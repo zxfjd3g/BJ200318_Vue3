@@ -1,52 +1,93 @@
 <template>
-  <div class="about">
-    <h2>state.msg: {{msg}}</h2>
-    <h2>state.numbers[1]: {{numbers[1]}}</h2>
-    <h2>state.person.name: {{person.name}}</h2>
-    <button @click="update">更新</button>
-  </div>
+<div class="about">
+  <h2>msg: {{msg}}</h2>
+  <hr>
+  <button @click="update">更新</button>
+</div>
 </template>
 
 <script lang="ts">
-  import {reactive, toRefs} from 'vue'
+import {
+  ref,
+  onMounted,
+  onUpdated,
+  onUnmounted, 
+  onBeforeMount, 
+  onBeforeUpdate,
+  onBeforeUnmount
+} from "vue"
 
-  interface State {
-    msg: string;
-    numbers: number[];
-    person: {
-      name?: string;
-    };
-  }
+export default {
+  beforeCreate () {
+    console.log('beforeCreate()')
+  },
 
-  export default {
+  created () {
+    console.log('created')
+  },
 
+  beforeMount () {
+    console.log('beforeMount')
+  },
+
+  mounted () {
+    console.log('mounted')
+  },
+
+  beforeUpdate () {
+    console.log('beforeUpdate')
+  },
+
+  updated () {
+    console.log('updated')
+  },
+
+  beforeUnmount () {
+    console.log('beforeUnmount')
+  },
+
+  unmounted () {
+     console.log('unmounted')
+  },
+  
+
+  setup() {
+    console.log('setup()')
     
-    setup () {
+    const msg = ref('abc')
 
-      // state对象是reactive中原始对象的代理对象
-      // 一旦操作代理对象的属性, 内部操作的是原始对象的属性
-      const state: State = reactive({
-        msg: 'abc',
-        numbers: [1, 2, 3],
-        person: {
-          // name: 'tom'
-        },
+    const update = () => {
+      msg.value += '--'
+    }
 
-        update: () => {
-          state.msg += '--'
-          state.numbers[1] += 1  // 根据下标替换数组中的元素: 在vue2中不会自动更新, 但在vue3会自动
-          state.person.name += '++'  // 给响应式对象添加一个新属性:  在vue2中不会自动更新, 但在vue3会自动
-        }
-      })
+    onBeforeMount(() => {
+      console.log('--onBeforeMount')
+    })
 
-      // 问题: reactive响应式对象一旦解构出来的属性不是响应式
-      // 解决: 使用toRefs将对象中的每个属性都变为ref对象
-      const stateRef = toRefs(state) // 将对象中的每个属性都变为ref对象
-       
-      return {
-        // ...state
-        ...stateRef
-      }
+    onMounted(() => {
+      console.log('--onMounted')
+    })
+
+    onBeforeUpdate(() => {
+      console.log('--onBeforeUpdate')
+    })
+
+    onUpdated(() => {
+      console.log('--onUpdated')
+    })
+
+    onBeforeUnmount(() => {
+      console.log('--onBeforeUnmount')
+    })
+
+    onUnmounted(() => {
+      console.log('--onUnmounted')
+    })
+    
+    return {
+      msg,
+      update
     }
   }
+}
 </script>
