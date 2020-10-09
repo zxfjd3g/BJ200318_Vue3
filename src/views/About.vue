@@ -1,38 +1,51 @@
 <template>
   <div class="about">
-    <!-- 模板中读取ref对象时, 会自动读取其value显示 -->
-    <h2>{{count}}</h2>
-    <button @click="increment">加1</button>
+    <h2>state.msg: {{msg}}</h2>
+    <h2>state.numbers[1]: {{numbers[1]}}</h2>
+    <h2>state.person.name: {{person.name}}</h2>
+    <button @click="update">更新</button>
   </div>
 </template>
 
 <script lang="ts">
-  import {ref} from 'vue'
+  import {reactive, toRefs} from 'vue'
+
+  interface State {
+    msg: string;
+    numbers: number[];
+    person: {
+      name?: string;
+    };
+  }
+
   export default {
 
-    beforeCreate () {
-      console.log('beforeCreate()')
-    },
-
-    /* 
-    在beforeCreate()之前执行的回调函数
-    不能通过this来访问组件实例对象
-    一般用来提供供模板使用的响应式数据和函数(更新数据)
-    */
+    
     setup () {
-       console.log('setup()', this)
-      // 定义一个响应式Ref对象
-      const count = ref(1) // 引用对象, 内部包含了一个value属性来存储数据
-      console.log(count, count.value)
 
-      // 用于更新响应式数据的函数
-      const increment = () => {
-        count.value += 1
-      }
+      // state对象是reactive中原始对象的代理对象
+      // 一旦操作代理对象的属性, 内部操作的是原始对象的属性
+      const state: State = reactive({
+        msg: 'abc',
+        numbers: [1, 2, 3],
+        person: {
+          // name: 'tom'
+        },
 
-      return { // 返回对象中的所有属性和方法, 模板可以直接访问
-        count,
-        increment
+        update: () => {
+          state.msg += '--'
+          state.numbers[1] += 1  // 根据下标替换数组中的元素: 在vue2中不会自动更新, 但在vue3会自动
+          state.person.name += '++'  // 给响应式对象添加一个新属性:  在vue2中不会自动更新, 但在vue3会自动
+        }
+      })
+
+      // 问题: reactive响应式对象一旦解构出来的属性不是响应式
+      // 解决: 使用toRefs将对象中的每个属性都变为ref对象
+      const stateRef = toRefs(state) // 将对象中的每个属性都变为ref对象
+       
+      return {
+        // ...state
+        ...stateRef
       }
     }
   }
