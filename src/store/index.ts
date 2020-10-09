@@ -10,3 +10,8 @@ export default createStore({
   modules: {
   }
 })
+
+
+// new Vuex.Store({
+
+// })
